@@ -1,0 +1,1 @@
+30 04 * * * /usr/bin/python3 /home/ywpc/Scripts/generate_efu_and_tree.py > /var/log/daily_scan.log 2>&1

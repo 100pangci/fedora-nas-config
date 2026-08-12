@@ -1,0 +1,19 @@
+services:
+  jellyfin:
+    image: docker.io/jellyfin/jellyfin:latest
+    container_name: jellyfin
+    # 核心：允许 rootless 容器共享宿主机的 GPU 组权限
+    group_add:
+      - "keep-groups"
+    devices:
+      - /dev/dri:/dev/dri  # 直通核显
+    volumes:
+      - ./config:/config:z
+      - ./cache:/cache:z
+      - /mnt/New-1:/media/New-1  # 挂载你挂载好的大硬盘
+      - /mnt/New-2:/media/New-2
+      - /mnt/Old-1:/media/Old-1
+      - /mnt/Old-2:/media/Old-2
+    ports:
+      - "8096:8096"
+    restart: "no"  # 已停用自启(2026-08-08),需要时手动 podman start jellyfin

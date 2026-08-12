@@ -1,0 +1,59 @@
+# 路径: ~/docker-apps/openlist/docker-compose.yml  
+services:  
+  openlist:  
+    image: openlistteam/openlist:latest  
+    container_name: openlist
+    user: '0:0'
+    environment:  
+      - UMASK=022  
+      - TZ=Asia/Shanghai  
+      # 👈 核心：强制覆盖 Podman 自动注入的 127.0.0.1 代理，指向宿主机代理
+      - HTTP_PROXY=http://host.containers.internal:1145
+      - HTTPS_PROXY=http://host.containers.internal:1145
+      - http_proxy=http://host.containers.internal:1145
+      - https_proxy=http://host.containers.internal:1145
+      # 👈 避坑（极其重要）：必须让 Openlist 连接 mysql 和 meilisearch 的流量绕过代理！
+      - NO_PROXY=localhost,127.0.0.1,mysql,meilisearch,host.containers.internal
+    volumes:  
+      - ./config:/opt/openlist/data:z      # 配置、日志、缓存放本地  
+      - /mnt/Old-1:/mnt/Old-1:rslave             # 把整个 NTFS 映射进去供其读取和挂载
+      - /mnt/Old-2:/mnt/Old-2:rslave
+      - /mnt/New-1:/mnt/New-1:rslave
+      - /mnt/New-2:/mnt/New-2:rslave
+      - /mnt/Vault-1:/mnt/Vault-1:rslave
+      - /mnt/Vault-2:/mnt/Vault-2:rslave
+      - /mnt/Temp:/mnt/Temp:rslave
+    ports:  
+      - "5244:5244"  
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - meilisearch
+
+  # 匹配你配置中的 MySQL 数据库
+  mysql:
+    image: mysql:8.0  # 如果你之前用的是 5.7 可以改成 mysql:5.7
+    container_name: openlist_mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=<REDACTED-填实际MySQL密码>    # 匹配你配置中的密码
+      - MYSQL_DATABASE=Openlist            # 匹配你配置中的数据库名
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./mysql_data:/var/lib/mysql:z      # 数据库数据持久化到本地，加 :z 适配 Fedora SELinux
+    ports:
+      - "3306:3306"                        # 如果不需要从宿主机外部连数据库，可以删掉这行
+    restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password # 增加兼容性
+
+  # 匹配你配置中的 Meilisearch 搜索引擎
+  meilisearch:
+    image: docker.io/getmeili/meilisearch:v1.47.0  # ⚠️ 固定版本!数据为 1.47.0 建的库,latest(1.52)不兼容拒启;勿改回 latest
+    container_name: openlist_meilisearch
+    environment:
+      - MEILI_ENV=development              # 开发模式允许无 API_KEY 运行（匹配你配置里 api_key 为空）
+      - MEILI_NO_ANALYTICS=true
+    volumes:
+      - ./meili_data:/meili_data:z         # 搜索索引持久化到本地，加 :z 适配 Fedora SELinux
+    ports:
+      - "7700:7700"
+    restart: unless-stopped

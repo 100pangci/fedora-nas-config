@@ -1,0 +1,23 @@
+services:
+  qbittorrent-ee:
+    image: superng6/qbittorrentee:latest
+    container_name: qbittorrent-ee
+    network_mode: "host"                   # <--- 添加这一行
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Asia/Shanghai
+      - WEBUIPORT=7474                     # <--- 使用环境变量强制指定 WebUI 端口
+    volumes:
+      - ./config:/config:z                 
+      - ./vuetorrent:/vuetorrent:z
+      - /mnt/Old-1:/mnt/Old-1                  
+      - /mnt/Old-2:/mnt/Old-2
+      - /mnt/New-1:/mnt/New-1
+      - /mnt/New-2:/mnt/New-2
+      - /mnt/SSD-Cache/Temp:/mnt/Temp:z
+    # ports:                               # <--- 注释掉 ports，因为 host 模式下 ports 映射无效
+    #  - "7474:8080"                        
+    #  - "6881:6881"                        
+    #  - "6881:6881/udp"                    
+    restart: unless-stopped

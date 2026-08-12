@@ -1,0 +1,9 @@
+[Unit]
+Description=Check and update LocalSend CLI container
+
+[Service]
+Type=oneshot
+Environment=HTTP_PROXY=http://127.0.0.1:1145
+Environment=HTTPS_PROXY=http://127.0.0.1:1145
+Environment=NO_PROXY=localhost,127.0.0.1
+ExecStart=/home/ywpc/Podman/LocalSend/build.sh

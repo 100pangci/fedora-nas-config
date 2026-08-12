@@ -1,0 +1,9 @@
+services:
+  peerbanhelper:
+    image: "docker.io/ghostchu/peerbanhelper:latest"
+    restart: unless-stopped
+    container_name: "peerbanhelper"
+    volumes:
+      - ./data:/app/data:Z
+    network_mode: host
+    stop_grace_period: 30s

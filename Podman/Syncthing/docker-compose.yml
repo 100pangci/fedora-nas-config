@@ -1,0 +1,14 @@
+# 路径: ~/docker-apps/syncthing/docker-compose.yml
+services:
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    network_mode: "host"
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./config:/config:z               # 配置和数据库放本地硬盘
+      - /mnt/SSD-Cache/Syncthing:/mnt/Syncthing:z
+    restart: unless-stopped

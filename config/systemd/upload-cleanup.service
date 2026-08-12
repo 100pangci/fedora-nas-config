@@ -1,0 +1,6 @@
+[Unit]
+Description=Delete OpenWebUI uploads older than 60 days
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/find /home/ywpc/Podman/OpenWebUI/config/uploads -type f -mtime +60 -delete

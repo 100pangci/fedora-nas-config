@@ -1,0 +1,15 @@
+services:
+  vnstat-dashboard:
+    image: kshitizb/vnstat-dashboard:latest
+    container_name: vnstat-dashboard
+    restart: unless-stopped
+    network_mode: host
+    privileged: true
+    environment:
+      - PORT=8685
+      # 【新增】把 podman 和 veth 前缀加进去，覆盖掉默认值
+      - ALLOWED_PREFIXES=eth,enp,wlan,wlp,tailscale,docker,podman,veth
+    volumes:
+      - /var/lib/vnstat:/var/lib/vnstat:ro
+    security_opt:
+      - label=disable

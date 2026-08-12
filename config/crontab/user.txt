@@ -1,0 +1,1 @@
+0 6 * * * find /home/ywpc/Podman/OpenWebUI/config/uploads -type f -mtime +60 -delete

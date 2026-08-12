@@ -1,0 +1,20 @@
+services:
+  fluxdown-server:
+    image: ghcr.io/zerx-lab/fluxdown-server:latest
+    container_name: fluxdown-server
+    restart: unless-stopped
+    environment:
+      - HTTP_PROXY=http://host.containers.internal:1145
+      - HTTPS_PROXY=http://host.containers.internal:1145
+      - NO_PROXY=localhost,127.0.0.1
+    ports:
+      - "17800:17800"
+    volumes:
+      - fluxdown-data:/data:z
+      - /mnt/New-1:/root/Downloads/New-1
+      - /mnt/New-2:/root/Downloads/New-2
+      - /mnt/Old-1:/root/Downloads/Old-1
+      - /mnt/Old-2:/root/Downloads/Old-2
+
+volumes:
+  fluxdown-data:

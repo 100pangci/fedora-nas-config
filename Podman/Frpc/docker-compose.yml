@@ -1,0 +1,18 @@
+services:
+  frpc:
+    image: snowdreamtech/frpc:latest
+    container_name: frpc
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./config/frpc.toml:/etc/frp/frpc.toml:ro,z
+    # 轮询探测宿主机的 1145 端口，代理服务就绪后再启动 frpc
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for proxy container to open port 1145...';
+      while ! nc -z 127.0.0.1 1145; do
+        sleep 1.5;
+      done;
+      echo 'Port 1145 is open! Starting frpc now...';
+      exec /usr/bin/frpc -c /etc/frp/frpc.toml
+      "

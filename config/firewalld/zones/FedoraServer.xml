@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zone>
+  <short>Public</short>
+  <description>For use in public areas. You do not trust the other computers on networks to not harm your computer. Only selected incoming connections are accepted.</description>
+  <service name="ssh"/>
+  <service name="dhcpv6-client"/>
+  <service name="cockpit"/>
+  <service name="samba"/>
+  <service name="samba-client"/>
+  <service name="V2ray_proxy"/>
+  <service name="peerbanhelper"/>
+  <service name="Bili-Sync"/>
+  <service name="qBE_webui"/>
+  <service name="syncthing_webui"/>
+  <service name="OpenWebUI"/>
+  <service name="OpenList"/>
+  <service name="scrutiny"/>
+  <service name="VNStat"/>
+  <service name="OpenClaw"/>
+  <service name="qBE_Server"/>
+  <service name="Syncthing_Server"/>
+  <service name="Syncthing_Server_LAN"/>
+  <service name="Jellyfin_Server_LAN"/>
+  <service name="Jellyfin"/>
+  <service name="Localsend"/>
+  <service name="LinuxServer"/>
+  <service name="Frpc"/>
+  <service name="mdns"/>
+  <service name="dufs"/>
+  <service name="minecraft"/>
+  <service name="FluxDown"/>
+  <service name="LocalSend"/>
+  <masquerade/>
+  <forward/>
+</zone>

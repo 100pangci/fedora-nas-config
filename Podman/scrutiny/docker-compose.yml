@@ -1,0 +1,21 @@
+services:
+  scrutiny:
+    container_name: scrutiny
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
+    security_opt:
+      - label:disable # 关键：在 Fedora/RHEL 系统上禁用此容器的 SELinux 限制
+    ports:
+      - "8088:8080" # 网页访问端口
+      - "8086:8086" # 数据库端口
+    volumes:
+      - /run/udev:/run/udev:ro
+      - /dev:/dev # 关键：必须将宿主机的整个 /dev 目录挂载进去
+      - ./config:/opt/scrutiny/config:z
+      - ./influxdb:/opt/scrutiny/influxdb:z
+    privileged: true # 必须开启
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai

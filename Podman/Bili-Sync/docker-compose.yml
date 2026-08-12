@@ -1,0 +1,16 @@
+services:
+  bili-sync-rs:
+    image: amtoaer/bili-sync-rs:latest
+    restart: unless-stopped
+    network_mode: bridge
+    tty: true
+    hostname: bili-sync-rs
+    container_name: bili-sync-rs
+    security_opt:
+      - label=disable
+    ports:
+      - 12345:12345
+    volumes:
+      - ./config:/app/.config/bili-sync:Z
+      - ./metadata:/app/.config/bili-sync/upper_face:Z
+      - /mnt/New-2/Video/Blibili爬取:/bili-sync

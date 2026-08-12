@@ -1,0 +1,98 @@
+# frpc.toml
+
+serverAddr = "22.22.22.22"
+serverPort = 7000
+
+[auth]
+method = "token"
+token = "<REDACTED-填实际token>"
+
+[transport]
+proxyURL = "socks5://127.0.0.1:1145"
+tls.enable = false
+tcpMux = true
+heartbeatInterval = 30
+heartbeatTimeout = 120
+
+[[proxies]]
+name = "syncthing"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8384
+remotePort = 8384
+
+[[proxies]]
+name = "qbittorrent"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 7474
+remotePort = 7474
+
+[[proxies]]
+name = "openlist"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 5244
+remotePort = 5244
+
+[[proxies]]
+name = "bilisync"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 12345
+remotePort = 12345
+
+[[proxies]]
+name = "peerbanhelper"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 9898
+remotePort = 9898
+
+[[proxies]]
+name = "Open-webui"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8080
+remotePort = 8080
+transport.useCompression = true
+
+[[proxies]]
+name = "LinuxServer-Desktop"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 3001
+remotePort = 3000
+
+[[proxies]]
+name = "Cockpit"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 9090
+remotePort = 9090
+
+[[proxies]]
+name = "Scrutiny"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8088
+remotePort = 8088
+
+[[proxies]]
+name = "SSH"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 22
+remotePort = 60022
+
+[[proxies]]
+name = "Jellyfin"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 8096
+remotePort = 8096
+
+
+
+
+
