@@ -14,10 +14,6 @@ config/
 ├── fstab/                        # 磁盘挂载表（XFS 全盘，UUID 直挂）
 ├── samba/smb.conf                # Samba 共享（仅 ywpc 可读写）
 ├── containers/containers.conf    # Podman 引擎用户配置
-├── ssh/sshd_config               # SSH 服务配置（默认）
-├── selinux/
-│   ├── config                    # SELinux 模式（Enforcing）
-│   └── booleans.txt              # 全部布尔值快照（getsebool -a）
 ├── firewalld/                    # 防火墙 zones + 24 个自定义服务定义
 │   ├── zones/                    # FedoraServer.xml（默认 zone）
 │   └── services/                 # qBE/scrutiny/Syncthing/V2ray_proxy 等
@@ -26,7 +22,6 @@ config/
 │   └── user.txt                  # 用户 crontab（上传清理）
 └── systemd/
     ├── podman-restart.service   # 系统级：rootful 容器开机自启
-    ├── override.conf.bak.20260808  # 已弃用的用户级 podman 代理 override 备份
     ├── localsend-update.{service,timer}  # LocalSend 每周一 04:00 自动更新
     └── upload-cleanup.{service,timer}    # 每日 06:00 清理 OpenWebUI 旧上传
 Podman/
@@ -52,12 +47,14 @@ Scripts/generate_efu_and_tree.py # 每日目录树/EFU 生成（~/Scripts）
 | `Podman/minecraft/mefrp/docker-compose.yml` | 三方 frp 令牌 |
 | `Tools/rar_background_archive.sh` / `_vn.sh` / `rar_background_unpacker.sh` | RAR 压缩密码 / SMB 账户密码 |
 
-**不包含**（敏感，仅本地保管）：
+**不包含**（敏感或未改动，仅本地保管）：
 
 - `~/.ssh/authorized_keys`（SSH 公钥）
 - `~/Podman/LocalSend/.env`（LocalSend 相关，见独立仓库）
 - `~/Podman/Ubuntu-Xfce/config/Software/v2rayN/`（订阅与代理配置）
 - VeraCrypt 加密卷（挂载点不公开，仓库中以 `Vault-1`/`Vault-2` 指代）的密码
+- `/etc/ssh/sshd_config`、`/etc/selinux/`（均为发行版默认，未做改动）
+- 已弃用的 podman 代理 override.conf 备份（无需还原，见维护手册 3.2 节）
 
 ## 恢复用法
 
