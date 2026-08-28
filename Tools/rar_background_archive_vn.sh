@@ -10,8 +10,8 @@ PASSWORD="<REDACTED-填实际压缩密码>"
 VOLUME_SIZE="4g"
 # 5. 恢复记录比例：10% (p表示百分比)
 RECOVERY_RECORD="10p"
-# 6. 压缩日志存放目录
-LOG_DIR="/mnt/New-2/Temp/logs"
+# 6. 压缩日志存放目录（统一放 SSD 缓存区，避免机械盘长期写入）
+LOG_DIR="/mnt/SSD-Cache/Temp"
 # 7. 用于主动刷新 SMB 缓存的本地账号和密码
 SMB_USER="ywpc"
 SMB_PASS="<REDACTED-填实际账户密码>"

@@ -101,11 +101,11 @@ DELETE_CONFIRM=""
 read -k 1 -r "DELETE_CONFIRM?是否在解压成功后自动删除源压缩包？(y/N): "
 echo "" # 换行
 
-# 5. 决定日志存放路径
+# 5. 决定日志存放路径（统一放 SSD 缓存区 Temp，避免机械盘长期写入）
 local PARENT_DIR BASENAME LOG_FILE
 if (( is_batch )); then
     PARENT_DIR="$SRC_PATH"
-    LOG_DIR="$PARENT_DIR/unrar_logs"
+    LOG_DIR="/mnt/SSD-Cache/Temp"
     mkdir -p "$LOG_DIR"
     TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
     LOG_FILE="$LOG_DIR/batch_unrar_${TIMESTAMP}.log"
@@ -113,7 +113,7 @@ else
     PARENT_DIR=$(dirname "$SRC_PATH")
     BASENAME=$(basename "$SRC_PATH")
     DIRNAME=$(echo "$BASENAME" | sed -E 's/\.part[0-9]+\.rar$//I' | sed -E 's/\.(rar|zip|7z)$//I')
-    LOG_DIR="$PARENT_DIR/unrar_logs"
+    LOG_DIR="/mnt/SSD-Cache/Temp"
     mkdir -p "$LOG_DIR"
     TIMESTAMP=$(date "+%Y%m%d_%H%M%S")
     LOG_FILE="$LOG_DIR/${DIRNAME}_unrar_${TIMESTAMP}.log"
