@@ -78,10 +78,13 @@ if [[ -d "$SRC_PATH" ]]; then
     fi
     echo "📂 扫描完成！共发现 ${#archives} 个待解压压缩包。"
 else
-    if [[ "$SRC_PATH" =~ \.part[0-9]+\.rar$ ]]; then
-        FIRST_PART=$(echo "$SRC_PATH" | sed -E 's/\.part[0-9]+\.rar$/.part1.rar/')
-        if [[ "$SRC_PATH" != "$FIRST_PART" ]]; then
-            echo "提示: 检测到分卷文件，已自动切换到第一卷: $FIRST_PART"
+    if [[ "$SRC_PATH" =~ '\.part([0-9]+)\.rar$' ]]; then
+        local digits="${match[1]}"
+        if (( $((10#$digits)) != 1 )); then
+            # RAR 7.x 分卷为两位零填充(part01)，此处保留填充宽度，避免改出不存在的 part1
+            local first_pad="$(printf "%0*d" "${#digits}" 1)"
+            FIRST_PART="${SRC_PATH%.part${digits}.rar}.part${first_pad}.rar"
+            echo "提示: 检测到分卷文件(第 ${digits} 卷)，已自动切换到第一卷: $FIRST_PART"
             SRC_PATH="$FIRST_PART"
         fi
     fi

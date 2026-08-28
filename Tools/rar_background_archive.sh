@@ -51,7 +51,7 @@ SRC_PATH="${SRC_PATH%\"}"
 SRC_PATH="${SRC_PATH#\'}"
 SRC_PATH="${SRC_PATH%\'}"
 if [[ "$SRC_PATH" =~ '^[a-zA-Z]:' || ( "$SRC_PATH" == *'\'* && "$SRC_PATH" != */* ) ]]; then
-    SRC_PATH="${TEXT_PATH//\\//}"
+    SRC_PATH="${SRC_PATH//\\//}"
 else
     SRC_PATH="${(Q)SRC_PATH}"
 fi
