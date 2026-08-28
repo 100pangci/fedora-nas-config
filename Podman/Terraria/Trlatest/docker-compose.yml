@@ -1,0 +1,14 @@
+services:
+  terraria:
+    container_name: terraria-server
+    image: ywpc05/terraria:latest
+    stop_grace_period: 30s
+    ports:
+      - "7777:7777"
+    restart: unless-stopped
+    environment:
+      - world=<REDACTED-填世界文件名>
+    volumes:
+      - ./config:/config:Z
+    tty: true
+    stdin_open: true

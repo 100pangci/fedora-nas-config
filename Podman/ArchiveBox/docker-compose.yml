@@ -1,0 +1,24 @@
+services:
+  archivebox:
+    image: archivebox/archivebox:latest
+    container_name: archivebox
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - ALLOWED_HOSTS=*
+      - MEDIA_MAX_SIZE=500m
+      - TIMEOUT=120
+      - SAVE_ARCHIVE_DOT_ORG=False
+      - SAVE_SCREENSHOT=True
+      - SAVE_PDF=True
+      - SAVE_SINGLEFILE=True
+      - SAVE_WARC=True
+      - HTTP_PROXY=http://host.containers.internal:1145
+      - HTTPS_PROXY=http://host.containers.internal:1145
+      - NO_PROXY=localhost,127.0.0.1,host.containers.internal
+    volumes:
+      # 数据库、配置、日志等元数据留在当前 SSD/系统盘目录下
+      - ./data:/data:z
+      # 将大文件归档目录覆盖挂载到你的 XFS 大容量机械盘上
+      - /mnt/New-2/Data/Archive:/data/archive

@@ -1,5 +1,5 @@
 services:
-  frpc:
+  mcfrpc:
     image: docker.io/menetx/frpc:latest
     # 你的三方 frp 启动命令
     entrypoint: ["./mefrpc", "-t", "<REDACTED-填三方frp令牌>", "-p", "163706"]

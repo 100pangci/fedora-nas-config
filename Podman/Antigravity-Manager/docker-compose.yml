@@ -1,0 +1,13 @@
+services:
+  antigravity-manager:
+    image: lbjlaq/antigravity-manager:latest
+    container_name: antigravity-manager
+    restart: unless-stopped
+    ports:
+      - "8045:8045"
+    environment:
+      - API_KEY=<REDACTED-填实际API_KEY>
+      - WEB_PASSWORD=<REDACTED-填实际管理密码>
+      - ABV_MAX_BODY_SIZE=104857600
+    volumes:
+      - ~/.antigravity_tools:/root/.antigravity_tools:z

@@ -1,0 +1,20 @@
+services:
+  localsend:
+    # Image is built and published by GitHub Actions
+    image: ywpc05/localsend-cli:latest
+    container_name: localsend
+    restart: unless-stopped
+    # Host networking: LAN multicast discovery + port 53317 exposed directly
+    network_mode: host
+    # keep-id: map container uid 1000 to the same uid on the host so that
+    # bind-mounted files are writable
+    userns_mode: keep-id
+    # Headless TUI: attach with `podman attach localsend` to confirm requests
+    tty: true
+    # Persistent settings (alias/port/destination) live in
+    # config/localsend-cli/config.toml and survive restarts and rebuilds
+    volumes:
+      - ${LOCALSEND_DESTINATION:-./downloads}:/downloads
+      - ./config:/home/localsend/.config:z
+
+volumes: {}
