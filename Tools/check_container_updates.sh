@@ -16,13 +16,28 @@ export no_proxy="localhost,127.0.0.1"
 
 # 排除配置
 EXCLUDE_NAMES=("mc-fabric-server")
-FIXED_IMAGES=("docker.io/getmeili/meilisearch:v1.47.0")
+# 固定版本镜像: 精确匹配或前缀匹配(如 "docker.io/library/mysql:8.0" 匹配 mysql:8.0.x)
+# 说明: mysql 8.0 为固定主版本(openlist 依赖),meilisearch 1.47.0 为数据兼容锁定
+FIXED_IMAGES=(
+    "docker.io/getmeili/meilisearch:v1.47.0"
+    "docker.io/library/mysql:8.0"
+)
 
 # 辅助函数: 判断元素是否在数组中
 in_array() {
     local target="$1"; shift
     for item in "$@"; do
         [[ "$item" == "$target" ]] && return 0
+    done
+    return 1
+}
+
+# 判断镜像是否属于固定版本(精确匹配,或镜像以固定前缀开头)
+is_fixed_image() {
+    local img="$1"
+    in_array "$img" "${FIXED_IMAGES[@]}" && return 0
+    for prefix in "${FIXED_IMAGES[@]}"; do
+        [[ "$img" == "$prefix"* ]] && return 0
     done
     return 1
 }
@@ -59,7 +74,7 @@ for line in "${lines[@]}"; do
         echo "[跳过] 容器: $name (已排除)"
         continue
     fi
-    if in_array "$img" "${FIXED_IMAGES[@]}"; then
+    if is_fixed_image "$img"; then
         echo "[固定] 镜像: $img (版本锁定，跳过)"
         continue
     fi
@@ -103,7 +118,7 @@ for line in "${lines[@]}"; do
     img="${line#*$'\t'}"
 
     in_array "$name" "${EXCLUDE_NAMES[@]}" && continue
-    in_array "$img" "${FIXED_IMAGES[@]}" && continue
+    is_fixed_image "$img" && continue
     [[ "$img" == localhost/* ]] && continue
 
     container_img_id=$(podman inspect "$name" --format '{{.Image}}' 2>/dev/null)
@@ -138,7 +153,7 @@ done
 
 for dir in "${!dirs[@]}"; do
     echo "[重建] 目录: $dir"
-    (cd "$dir" && podman compose up -d 2>&1 | tail -5)
+    (cd "$dir" && podman compose up -d --force-recreate 2>&1 | tail -5)
 done
 
 echo ""
