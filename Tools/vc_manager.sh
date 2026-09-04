@@ -64,12 +64,40 @@ release_smb_for_path() {
     sleep 1
 }
 
+# 卸载前释放 bind mount 了该路径的容器对该路径的占用
+# 容器 bind :rslave 挂载会在其 mount namespace 持有引用,宿主 umount 后 dm/loop 仍被占用无法释放
+# 策略: 先尝试容器内 umount(零停机),失败则重启容器兜底(重启后 bind 引用必然释放)
+release_container_for_path() {
+    local target="$1"
+    command -v podman &> /dev/null || return 0
+
+    local found=0
+    while IFS= read -r container; do
+        [ -z "$container" ] && continue
+        if podman inspect --format '{{range .Mounts}}{{.Source}} {{.Destination}}{{"\n"}}{{end}}' "$container" 2>/dev/null \
+            | awk '{print $1}' | grep -qxF "$target"; then
+            if [ "$found" -eq 0 ]; then
+                echo -e "${YELLOW}容器内仍挂着 $target 的 bind 引用,先卸载以免阻塞设备释放:${NC}"
+                found=1
+            fi
+            echo -e "  容器 ${YELLOW}$container${NC} 内尝试 umount ..."
+            if podman exec -u 0 "$container" umount "$target" 2>/dev/null; then
+                echo -e "    卸载成功"
+            else
+                echo -e "    ${YELLOW}容器内卸载失败,重启容器兜底 ...${NC}"
+                podman restart "$container"
+            fi
+        fi
+    done < <(podman ps --format '{{.Names}}')
+    sleep 1
+}
+
 # 获取所有 .hc 文件列表
 get_hc_files() {
     hc_files=()
     shopt -s nullglob
-    if [ -f "/mnt/New-2/Vault-1.hc" ]; then
-        hc_files+=("/mnt/New-2/Vault-1.hc")
+    if [ -f "/mnt/New-2/Weii.hc" ]; then
+        hc_files+=("/mnt/New-2/Weii.hc")
     fi
     for file in /mnt/Old-1/VM_Disk/*.hc; do
         hc_files+=("$file")
@@ -120,10 +148,10 @@ mount_volume() {
     # 智能路径分配逻辑
     if [[ "$selected_file" == *"冗余60%+multipar备份包"* ]]; then
         default_mount="/mnt/Temp"
-    elif [[ "$file_basename" == "Vault-1" ]]; then
-        default_mount="/mnt/Vault-1"
+    elif [[ "$file_basename" == "Weii" ]]; then
+        default_mount="/mnt/Weii"
     else
-        default_mount="/mnt/Vault-2"
+        default_mount="/mnt/H"
     fi
     echo -e "默认挂载路径: ${YELLOW}$default_mount${NC}"
     read -p "请输入挂载路径 (直接回车使用默认值): " custom_mount
@@ -203,6 +231,8 @@ unmount_volume() {
 
     # 卸载前先释放 Samba 对该路径的占用
     release_smb_for_path "$target_unmount"
+    # 再释放容器 bind 引用(容器内先 umount,失败自动重启兜底)
+    release_container_for_path "$target_unmount"
 
     echo "正在卸载 $target_unmount ..."
     if sudo veracrypt -d "$target_unmount"; then
@@ -216,11 +246,15 @@ unmount_volume() {
 unmount_all() {
     echo -e "${YELLOW}正在安全卸载所有加密卷...${NC}"
 
-    # 先对所有已挂载卷的路径释放 Samba 占用
+    # 先对所有已挂载卷的路径释放 Samba 占用,再释放容器 bind 引用
     mapfile -t all_mounted < <(sudo veracrypt -t -l 2>/dev/null)
     for line in "${all_mounted[@]}"; do
         m_path=$(echo "$line" | awk '{print $NF}')
         [ -n "$m_path" ] && release_smb_for_path "$m_path"
+    done
+    for line in "${all_mounted[@]}"; do
+        m_path=$(echo "$line" | awk '{print $NF}')
+        [ -n "$m_path" ] && release_container_for_path "$m_path"
     done
 
     if sudo veracrypt -d; then
